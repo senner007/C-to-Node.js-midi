@@ -13,7 +13,7 @@ namespace QuickStart.Core
         {
             var deviceList = await DeviceInformation.
                 FindAllAsync(MidiOutPort.GetDeviceSelector());
-            
+
             var deviceName = "";
 
             foreach (var deviceInfo in deviceList)
@@ -26,23 +26,39 @@ namespace QuickStart.Core
         }
         public async Task<object> PlayMidi(dynamic input)
         {
-            
-            if (currentMidiOutputDevice == null && (bool)input.openMidi)
+
+            if (currentMidiOutputDevice == null)
             {
-                var midiIsOpen = await OpenMidi();
-                return midiIsOpen;
+
+                try
+                {
+                    if ((bool)input.openMidi == true)
+                    {
+                        var midiIsOpen = await OpenMidi();
+                        return midiIsOpen;
+                    }
+                }
+                catch
+                {
+                    throw new Exception("Midi not open. Please call with param: { openMidi : true }");
+                }
+
             }
+
 
             int delay = (int)input.delay;
             int note = (int)input.note;
             bool isOn = (bool)input.isOn;
 
 
-            if (isOn == true) {
+            if (isOn == true)
+            {
                 var midiMessageToSend = new MidiNoteOnMessage(Convert.ToByte(0), Convert.ToByte(note), Convert.ToByte(127));
                 currentMidiOutputDevice.SendMessage(midiMessageToSend);
                 await Task.Delay(delay);
-            } else {
+            }
+            else
+            {
                 var midiMessageToSend = new MidiNoteOffMessage(Convert.ToByte(0), Convert.ToByte(note), Convert.ToByte(127));
                 currentMidiOutputDevice.SendMessage(midiMessageToSend);
             }
