@@ -21,22 +21,26 @@ var midiHandle = edge.func({
     methodName: 'PlayMidi'
 });
 
+
+// Await device select and add to midi out port
 midiHandle({ openMidi : true }, function(error, result) {
     if (error) throw error;
     console.log(result);
 
-    
+    // Play note
     midiHandle({ delay: 2000, note : 70, isOn: true}, function(error, result) {
         if (error) throw error;
         console.log(result);
     });
 
     setTimeout(() => {
+        // Stop note
         midiHandle({ delay: 0, note : 70, isOn : false}, function(error, result) {
             if (error) throw error;
             console.log(result);
         });
 
+        // Play notes
         midiHandle({ delay: 2000, note : 80, isOn : true}, function(error, result) {
             if (error) throw error;
             console.log(result);
