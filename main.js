@@ -37,8 +37,9 @@ midiHandle({ openMidi: true }, function (error, result) {
         console.log(result);
     });
 
+    // Play next note 500 ms later
     setTimeout(() => {
-        // Stop note
+        // Stop previous pote
         midiHandle({ delay: 0, note: 70, isOn: false }, function (error, result) {
             if (error) throw error;
             console.log(result);
