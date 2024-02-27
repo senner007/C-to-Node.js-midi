@@ -1,26 +1,18 @@
 const path = require('path');
-
 var namespace = 'QuickStart.Core'
-
 var version = '6.0-windows10.0.19041.0'
-
-const baseNetAppPath = path.join(__dirname, '/src/' + namespace + '/bin/Debug/net' + version);
-
+const baseNetAppPath = path.join(__dirname, '/src/' + namespace + '/bin/Debug/net' + version)
 process.env.EDGE_USE_CORECLR = 1;
-
 var edge = require('edge-js');
-
 var baseDll = path.join(baseNetAppPath, namespace + '.dll');
-
 var localTypeName = namespace + '.LocalMethods';
 
-
+// Read Assembly
 var midiHandle = edge.func({
     assemblyFile: baseDll,
     typeName: localTypeName,
     methodName: 'PlayMidi'
 });
-
 
 // Logs exception : 'Midi not open. Please call with param: { openMidi : true }'
 try {
@@ -34,7 +26,7 @@ try {
 }
 
 
-//Await device select and add to midi out port
+// Await device select and add to midi out port
 midiHandle({ openMidi: true }, function (error, result) {
     if (error) throw error;
     console.log(result);
@@ -63,7 +55,6 @@ midiHandle({ openMidi: true }, function (error, result) {
             console.log(result);
         });
     }, 500)
-
 
 });
 

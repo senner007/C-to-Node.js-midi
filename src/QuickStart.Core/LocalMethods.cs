@@ -7,7 +7,10 @@ namespace QuickStart.Core
 {
     public class LocalMethods
     {
-        public IMidiOutPort currentMidiOutputDevice { get; set; } = null;
+        public IMidiOutPort CurrentMidiOutputDevice { get; set; } = null;
+
+        public readonly int VOLUME = 127;
+        public readonly int CHANNEL = 0;
 
         public async Task<string> OpenMidi()
         {
@@ -19,7 +22,7 @@ namespace QuickStart.Core
             foreach (var deviceInfo in deviceList)
             {
                 deviceName = deviceInfo.Name.ToString();
-                currentMidiOutputDevice = await MidiOutPort.FromIdAsync(deviceInfo.Id);
+                CurrentMidiOutputDevice = await MidiOutPort.FromIdAsync(deviceInfo.Id);
 
             }
             return "Midi Opened: " + deviceName;
@@ -27,15 +30,14 @@ namespace QuickStart.Core
         public async Task<object> PlayMidi(dynamic input)
         {
 
-            if (currentMidiOutputDevice == null)
+            if (CurrentMidiOutputDevice == null)
             {
 
                 try
                 {
                     if ((bool)input.openMidi == true)
                     {
-                        var midiIsOpen = await OpenMidi();
-                        return midiIsOpen;
+                        return await OpenMidi();
                     }
                 }
                 catch
@@ -50,21 +52,22 @@ namespace QuickStart.Core
             int note = (int)input.note;
             bool isOn = (bool)input.isOn;
 
+            IMidiMessage midiMessage = null;
 
             if (isOn == true)
             {
-                var midiMessageToSend = new MidiNoteOnMessage(Convert.ToByte(0), Convert.ToByte(note), Convert.ToByte(127));
-                currentMidiOutputDevice.SendMessage(midiMessageToSend);
-                await Task.Delay(delay);
+                midiMessage = new MidiNoteOnMessage(Convert.ToByte(CHANNEL), Convert.ToByte(note), Convert.ToByte(VOLUME));
             }
             else
             {
-                var midiMessageToSend = new MidiNoteOffMessage(Convert.ToByte(0), Convert.ToByte(note), Convert.ToByte(127));
-                currentMidiOutputDevice.SendMessage(midiMessageToSend);
+                midiMessage = new MidiNoteOffMessage(Convert.ToByte(CHANNEL), Convert.ToByte(note), Convert.ToByte(VOLUME));
             }
 
-            return "Note played";
+            CurrentMidiOutputDevice.SendMessage(midiMessage);
+            
+            await Task.Delay(isOn ? delay : 0);
 
+            return isOn ? "Note played: " + note : "Note Stopped: " + note;
 
         }
     }
